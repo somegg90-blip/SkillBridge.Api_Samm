@@ -1,12 +1,31 @@
-using Microsoft.AspNetCore.Mvc;
-namespace SkillBridge.Api.Controllers;
+using SkillBridge.Api.Entities;
 
 public class UserRepository : IUserRepository
 {
-    public Task<string> CreateUserAsync(CreateUserRequestDto user)
+    private readonly SkillBridgeDbContext _context;
+        public UserRepository(SkillBridgeDbContext context)
+        {
+            _context = context;
+        }
+    public Task<string> CreateUserAsync(CreateUserRequestDto req_user)
     {
-        // Here you would typically add code to save the user to a database
-        // For this example, we'll just return a success message
-        return Task.FromResult("User created successfully!");
+        User user1 = new User();
+        user1.Name = req_user.Name;
+        user1.Email = req_user.Email;
+        user1.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req_user.Password);
+        user1.Type = req_user.Type;
+        user1.CreatedAt = DateTime.UtcNow;
+        user1.IsActive = true;
+
+        _context.Users.Add(user1);
+        var result = _context.SaveChanges();
+        if (result > 0)
+        {
+            return Task.FromResult("User created successfully!");
+        }
+        else
+        {
+            return Task.FromResult("Failed to create user.");
+        }
     }
 }

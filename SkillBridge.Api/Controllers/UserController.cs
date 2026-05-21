@@ -4,9 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class UserController : ControllerBase
 {
-    [HttpPost, Route("create")]
-    public string CreateUser(CreateUserRequestDto request)
+    private readonly IUserRepository _userRepository;
+    public UserController(IUserRepository userRepository)
     {
-        return "User created successfully!";
+        _userRepository = userRepository;
+    }
+    [HttpPost, Route("create")]
+    public async Task<string> CreateUser(CreateUserRequestDto request)
+    {
+        var result = await _userRepository.CreateUserAsync(request);
+        return result;
     }
 }
