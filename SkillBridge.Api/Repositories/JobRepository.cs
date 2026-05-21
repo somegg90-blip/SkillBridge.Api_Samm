@@ -1,31 +1,54 @@
+using Microsoft.EntityFrameworkCore;
+using SkillBridge.Api.Entities;
 public class JobRepository : IJobRepository
 {
+    private readonly SkillBridgeDbContext _context;
+    public JobRepository(SkillBridgeDbContext context)
+    {
+        _context = context;
+    }
     public async Task<IEnumerable<JobDto>> GetJobsListAsync()
     {
-        var jobList = new List<JobDto>
+        var jobList = await _context.Jobs.ToListAsync();
+        if(jobList != null)
         {
-            new JobDto
+            return jobList.Select(job => new JobDto
+        {
+            Id = job.Id,
+            Title = job.Title,
+            Description = job.Description,
+            Company = job.Company,
+            Location = job.Location,
+            JobType = job.JobType,
+            MinSalary = job.MinSalary,
+            MaxSalary = job.MaxSalary,
+            PostedDate = job.PostedDate,
+            DeadLineDate = job.DeadLineDate,
+            IsActive = job.IsActive
+        }).ToList();
+        }
+        return new List<JobDto>();
+    }
+    public async Task<JobDto> GetJobByIdAsync(int id)
+    {
+        var job = await _context.Jobs.FirstOrDefaultAsync(j => j.Id == id);
+        if (job != null)
+        {
+            return new JobDto
             {
-                Id = 1,
-                Name = "Software Engineer",
-                Description = "Develop and maintain software applications.",
-                MinSalary = 60000,
-                MaxSalary = 120000,
-                Company = "Tech Company A",
-                Location = "New York, NY"
-            },
-            new JobDto
-            {
-                Id = 2,
-                Name = "Data Scientist",
-                Description = "Analyze and interpret complex data to help companies make decisions.",
-                MinSalary = 70000,
-                MaxSalary = 130000,
-                Company = "Tech Company B",
-                Location = "San Francisco, CA"
-            }
-        };
-
-        return jobList;
+                Id = job.Id,
+                Title = job.Title,
+                Description = job.Description,
+                Company = job.Company,
+                Location = job.Location,
+                JobType = job.JobType,
+                MinSalary = job.MinSalary,
+                MaxSalary = job.MaxSalary,
+                PostedDate = job.PostedDate,
+                DeadLineDate = job.DeadLineDate,
+                IsActive = job.IsActive
+            };
+        }
+        return new JobDto();
     }
 }
