@@ -1,5 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 namespace SkillBridge.Api.Controllers;
+using Microsoft.EntityFrameworkCore;
+using SkillBridge.Api.Entities;
+
+
     [ApiController]
     [Route("[controller]")]
 
@@ -10,9 +14,14 @@ namespace SkillBridge.Api.Controllers;
     {
         _jobRepository = jobRepository;
     }
-    [HttpGet]
-    public IEnumerable<JobDto> Get()
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetJobById(int id)
     {
-        return _jobRepository.GetJobsListAsync().Result;
+        var job = await _jobRepository.GetJobByIdAsync(id);
+        if (job == null)
+        {
+            return NotFound();
+        }
+        return Ok(job);
     }
 }
