@@ -14,7 +14,6 @@ namespace SkillBridge.Api.Entities
         public string? PasswordHash { get; set; }
         [Required]
         public string? Type { get; set; }
-        [Required]
         public bool IsActive { get; set; }
         [Required]
         public DateTime CreatedAt { get; set; }
